@@ -8,7 +8,7 @@
   },
   "scripts": {
     "cache-clean": "rm -rf ~/.electron && rm -rf dist",
-    "postinstall": "rm -rf dist && node install.js",
+    "postinstall": "node install.js",
     "pretest": "npm run cache-clean && node install.js",
     "test": "tape test/*.js"
   },
@@ -17,8 +17,9 @@
   },
   "main": "index.js",
   "dependencies": {
+    "electron-download": "^1.0.0",
     "extract-zip": "^1.0.3",
-    "electron-download": "^1.0.0"
+    "fs-extra": "^0.26.5"
   },
   "devDependencies": {
     "home-path": "^0.1.1",

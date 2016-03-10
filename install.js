@@ -8,6 +8,9 @@ var os = require('os')
 var path = require('path')
 var extract = require('extract-zip')
 var download = require('electron-download')
+var fs = require('fs-extra')
+var distDir = path.join(__dirname, 'dist');
+
 
 var platform = os.platform()
 
@@ -23,16 +26,23 @@ var paths = {
 
 if (!paths[platform]) throw new Error('Unknown platform: ' + platform)
 
-// downloads if not cached
-download({version: version, arch: process.env.npm_config_arch}, extractFile)
+fs.remove(distDir, function (err) {
+  if (err) {
+    console.log(err);
+    return;
+  }
 
-// unzips and makes path.txt point at the correct executable
-function extractFile (err, zipPath) {
-  if (err) return onerror(err)
-  fs.writeFile(path.join(__dirname, 'path.txt'), paths[platform], function (err) {
+  // downloads if not cached
+  download({version: version, arch: process.env.npm_config_arch}, extractFile)
+
+  // unzips and makes path.txt point at the correct executable
+  function extractFile (err, zipPath) {
     if (err) return onerror(err)
-    extract(zipPath, {dir: path.join(__dirname, 'dist')}, function (err) {
+    fs.writeFile(path.join(__dirname, 'path.txt'), paths[platform], function (err) {
       if (err) return onerror(err)
+      extract(zipPath, {dir: distDir}, function (err) {
+        if (err) return onerror(err)
+      })
     })
-  })
-}
+  }
+})
